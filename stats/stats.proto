@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+option go_package = "alexstrive.com/stats";
+
+package covid_stats;
+
+service Stats {
+    rpc GetAllCovidCasesStream (Empty) returns (stream CovidCaseStatEntry);
+    rpc GetAllCovidCases (Empty) returns (CovidCaseStatEntryList);
+}
+
+message Empty {
+}
+
+message CovidCaseStatEntryList {
+    repeated CovidCaseStatEntry entries = 1;
+}
+
+message CovidCaseStatEntry {
+    string dateRep = 1;
+    uint32 day = 2;
+    uint32 month = 3;
+    uint32 year = 4;
+    uint64 cases = 5;
+    uint64 deaths = 6;
+    string countriesAndTerritories = 7;
+    uint64 popData2020 = 8;
+    string geo_id = 9;
+    string countryterritoryCode = 10;
+    string continentExp = 11;
+}
