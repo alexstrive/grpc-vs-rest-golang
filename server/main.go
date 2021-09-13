@@ -8,6 +8,7 @@ import (
 	pb "stats"
 
 	"google.golang.org/grpc"
+	_ "google.golang.org/grpc/encoding/gzip"
 )
 
 type statsServer struct {

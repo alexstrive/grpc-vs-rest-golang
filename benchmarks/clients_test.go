@@ -1,4 +1,4 @@
-package client
+package benchmarks
 
 import (
 	"context"
@@ -8,16 +8,18 @@ import (
 	"log"
 	"net/http"
 	pb "stats"
+	"testing"
 	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/encoding/gzip"
 )
 
 const (
 	address = "localhost:5000"
 )
 
-func TestRest(path string) {
+func ScenarioServerRest(path string) {
 	var arr []*pb.CovidCaseStatEntry
 	resp, err := http.Get(fmt.Sprintf("http://localhost:8080/%v", path))
 	if err != nil {
@@ -32,8 +34,8 @@ func TestRest(path string) {
 	json.Unmarshal(body, &arr)
 }
 
-func TestGetAllCovidCasesGrpc() {
-	conn, err := grpc.Dial(address, grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(1024*1024*8)), grpc.WithInsecure(), grpc.WithBlock())
+func ScenarioGetAllCovidCasesGrpc() {
+	conn, err := grpc.Dial(address, grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(1024*1024*8), grpc.UseCompressor(gzip.Name)), grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		log.Fatalf("Did not connect: %v", err)
 	}
@@ -46,5 +48,17 @@ func TestGetAllCovidCasesGrpc() {
 
 	if err != nil {
 		log.Fatalf("Could not get message: %v", err)
+	}
+}
+
+func BenchmarkCovidCasesGrpc_345KB(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		ScenarioGetAllCovidCasesGrpc()
+	}
+}
+
+func BenchmarkCovidCasesRest_345KB(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		ScenarioServerRest("covid.json")
 	}
 }
