@@ -1,4 +1,4 @@
-module server
+module grpcserver
 
 go 1.17
 

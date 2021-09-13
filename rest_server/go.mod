@@ -1,4 +1,4 @@
-module rest-server
+module restserver
 
 go 1.17
 
