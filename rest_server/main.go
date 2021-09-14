@@ -30,19 +30,29 @@ func EnableGZIP(fn http.Handler) http.Handler {
 }
 
 func main() {
-	handler := http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+	covidCasesHandler := http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		data, err := json.Marshal(pb.CovidCases)
 		if err != nil {
 			log.Printf("Unable to marshal data: %v", err)
 		}
-
-		rw.Header().Set("Content-Encoding", "gzip")
 		rw.Write(data)
 	})
 
-	http.Handle("/covid.json", EnableGZIP(handler))
+	http.Handle("/covidCasesGzip", EnableGZIP(covidCasesHandler))
+	http.Handle("/covidCases", covidCasesHandler)
 
-	log.Printf("Handlers have been registered")
+	stocksHandler := http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		data, err := json.Marshal(pb.Stocks)
+		if err != nil {
+			log.Printf("Unable to marshal data: %v", err)
+		}
+		rw.Write(data)
+	})
+
+	http.Handle("/stocksGzip", EnableGZIP(stocksHandler))
+	http.Handle("/stocks", stocksHandler)
+
+	log.Printf("All handlers have been registered")
 
 	http.ListenAndServe(":8080", nil)
 	log.Printf("Server has started")

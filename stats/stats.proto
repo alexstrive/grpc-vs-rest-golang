@@ -7,6 +7,9 @@ package covid_stats;
 service Stats {
     rpc GetAllCovidCasesStream (Empty) returns (stream CovidCaseStatEntry);
     rpc GetAllCovidCases (Empty) returns (CovidCaseStatEntryList);
+
+    rpc GetAllStocksStream (Empty) returns (stream Stock);
+    rpc GetAllStocks (Empty) returns (StockList);
 }
 
 message Empty {
@@ -28,4 +31,20 @@ message CovidCaseStatEntry {
     string geo_id = 9;
     string countryterritoryCode = 10;
     string continentExp = 11;
+}
+
+message StockList {
+    repeated Stock stocks = 1;
+}
+
+message Stock {
+    string index = 1;
+    string date = 2;
+    float open = 3;
+    float high = 4;
+    float low = 5;
+    float close = 6;
+    float adjClose = 7;
+    float volume = 8;
+    float closeUSD = 9;
 }

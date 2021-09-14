@@ -20,6 +20,8 @@ const _ = grpc.SupportPackageIsVersion7
 type StatsClient interface {
 	GetAllCovidCasesStream(ctx context.Context, in *Empty, opts ...grpc.CallOption) (Stats_GetAllCovidCasesStreamClient, error)
 	GetAllCovidCases(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*CovidCaseStatEntryList, error)
+	GetAllStocksStream(ctx context.Context, in *Empty, opts ...grpc.CallOption) (Stats_GetAllStocksStreamClient, error)
+	GetAllStocks(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*StockList, error)
 }
 
 type statsClient struct {
@@ -71,12 +73,55 @@ func (c *statsClient) GetAllCovidCases(ctx context.Context, in *Empty, opts ...g
 	return out, nil
 }
 
+func (c *statsClient) GetAllStocksStream(ctx context.Context, in *Empty, opts ...grpc.CallOption) (Stats_GetAllStocksStreamClient, error) {
+	stream, err := c.cc.NewStream(ctx, &Stats_ServiceDesc.Streams[1], "/covid_stats.Stats/GetAllStocksStream", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &statsGetAllStocksStreamClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type Stats_GetAllStocksStreamClient interface {
+	Recv() (*Stock, error)
+	grpc.ClientStream
+}
+
+type statsGetAllStocksStreamClient struct {
+	grpc.ClientStream
+}
+
+func (x *statsGetAllStocksStreamClient) Recv() (*Stock, error) {
+	m := new(Stock)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *statsClient) GetAllStocks(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*StockList, error) {
+	out := new(StockList)
+	err := c.cc.Invoke(ctx, "/covid_stats.Stats/GetAllStocks", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // StatsServer is the server API for Stats service.
 // All implementations must embed UnimplementedStatsServer
 // for forward compatibility
 type StatsServer interface {
 	GetAllCovidCasesStream(*Empty, Stats_GetAllCovidCasesStreamServer) error
 	GetAllCovidCases(context.Context, *Empty) (*CovidCaseStatEntryList, error)
+	GetAllStocksStream(*Empty, Stats_GetAllStocksStreamServer) error
+	GetAllStocks(context.Context, *Empty) (*StockList, error)
 	mustEmbedUnimplementedStatsServer()
 }
 
@@ -89,6 +134,12 @@ func (UnimplementedStatsServer) GetAllCovidCasesStream(*Empty, Stats_GetAllCovid
 }
 func (UnimplementedStatsServer) GetAllCovidCases(context.Context, *Empty) (*CovidCaseStatEntryList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllCovidCases not implemented")
+}
+func (UnimplementedStatsServer) GetAllStocksStream(*Empty, Stats_GetAllStocksStreamServer) error {
+	return status.Errorf(codes.Unimplemented, "method GetAllStocksStream not implemented")
+}
+func (UnimplementedStatsServer) GetAllStocks(context.Context, *Empty) (*StockList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllStocks not implemented")
 }
 func (UnimplementedStatsServer) mustEmbedUnimplementedStatsServer() {}
 
@@ -142,6 +193,45 @@ func _Stats_GetAllCovidCases_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Stats_GetAllStocksStream_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(Empty)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(StatsServer).GetAllStocksStream(m, &statsGetAllStocksStreamServer{stream})
+}
+
+type Stats_GetAllStocksStreamServer interface {
+	Send(*Stock) error
+	grpc.ServerStream
+}
+
+type statsGetAllStocksStreamServer struct {
+	grpc.ServerStream
+}
+
+func (x *statsGetAllStocksStreamServer) Send(m *Stock) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func _Stats_GetAllStocks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StatsServer).GetAllStocks(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/covid_stats.Stats/GetAllStocks",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StatsServer).GetAllStocks(ctx, req.(*Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Stats_ServiceDesc is the grpc.ServiceDesc for Stats service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -153,11 +243,20 @@ var Stats_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "GetAllCovidCases",
 			Handler:    _Stats_GetAllCovidCases_Handler,
 		},
+		{
+			MethodName: "GetAllStocks",
+			Handler:    _Stats_GetAllStocks_Handler,
+		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "GetAllCovidCasesStream",
 			Handler:       _Stats_GetAllCovidCasesStream_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "GetAllStocksStream",
+			Handler:       _Stats_GetAllStocksStream_Handler,
 			ServerStreams: true,
 		},
 	},

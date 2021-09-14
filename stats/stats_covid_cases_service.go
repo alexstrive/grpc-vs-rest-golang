@@ -8,8 +8,6 @@ import (
 var CovidCases []*CovidCaseStatEntry
 
 func init() {
-	log.Println("Initializing Covid Stats Service...")
-
 	// Columns
 	// dateRep,day,month,year,cases,deaths,countriesAndTerritories,geoId,countryterritoryCode,popData2020,continentExp
 	covidCasesRecords, _ := ReadCsvFile("../stats/data/covid-europe/covid-europe.csv")

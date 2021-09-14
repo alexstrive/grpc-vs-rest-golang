@@ -19,6 +19,10 @@ func (s *statsServer) GetAllCovidCases(ctx context.Context, in *pb.Empty) (*pb.C
 	return &pb.CovidCaseStatEntryList{Entries: pb.CovidCases}, nil
 }
 
+func (s *statsServer) GetAllStocks(ctx context.Context, in *pb.Empty) (*pb.StockList, error) {
+	return &pb.StockList{Stocks: pb.Stocks}, nil
+}
+
 func main() {
 	lis, err := net.Listen("tcp", "localhost:5000")
 	if err != nil {
