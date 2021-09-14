@@ -69,7 +69,7 @@ func MakeRestRequest(path string) {
 	json.Unmarshal(body, &arr)
 }
 
-func BenchmarkStocks_Grpc_20MB(b *testing.B) {
+func BenchmarkStocks_Grpc_10MB(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		MakeGrpcCall(false, func(ctx context.Context, client pb.StatsClient) {
 			_, err := client.GetAllStocks(ctx, &pb.Empty{})
@@ -80,7 +80,7 @@ func BenchmarkStocks_Grpc_20MB(b *testing.B) {
 	}
 }
 
-func BenchmarkStocks_Grpc_20MB_gzip(b *testing.B) {
+func BenchmarkStocks_Grpc_10MB_gzip(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		MakeGrpcCall(true, func(ctx context.Context, client pb.StatsClient) {
 			_, err := client.GetAllStocks(ctx, &pb.Empty{})
@@ -91,13 +91,13 @@ func BenchmarkStocks_Grpc_20MB_gzip(b *testing.B) {
 	}
 }
 
-func BenchmarkStocks_Rest_20MB(b *testing.B) {
+func BenchmarkStocks_Rest_10MB(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		MakeRestRequest("stocks")
 	}
 }
 
-func BenchmarkStocks_Rest_20MB_gzip(b *testing.B) {
+func BenchmarkStocks_Rest_10MB_gzip(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		MakeRestRequest("stocksGzip")
 	}
