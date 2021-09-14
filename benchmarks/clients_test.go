@@ -24,7 +24,7 @@ func makeGrpcGzipConn() (*grpc.ClientConn, error) {
 }
 
 func makeGrpcConn() (*grpc.ClientConn, error) {
-	return grpc.Dial(address, grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(1024*1024*8), grpc.UseCompressor(gzip.Name)), grpc.WithInsecure(), grpc.WithBlock())
+	return grpc.Dial(address, grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(1024*1024*8)), grpc.WithInsecure(), grpc.WithBlock())
 }
 
 func MakeGrpcCall(withGzip bool, callback func(ctx context.Context, client pb.StatsClient)) {
