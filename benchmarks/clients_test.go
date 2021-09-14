@@ -190,7 +190,7 @@ func BenchmarkVaccineEntries_Grpc_7MB_gzip(b *testing.B) {
 	}
 }
 
-func BenchmarkVaccineEntries_7MB_345KB(b *testing.B) {
+func BenchmarkVaccineEntries_Grpc_7MB(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		MakeGrpcCall(false, func(ctx context.Context, client pb.StatsClient) {
 			_, err := client.GetAllVaccineEntries(ctx, &pb.Empty{})
