@@ -22,6 +22,7 @@ type StatsClient interface {
 	GetAllCovidCases(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*CovidCaseStatEntryList, error)
 	GetAllStocksStream(ctx context.Context, in *Empty, opts ...grpc.CallOption) (Stats_GetAllStocksStreamClient, error)
 	GetAllStocks(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*StockList, error)
+	GetAllVaccineEntries(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*VaccineEntryList, error)
 }
 
 type statsClient struct {
@@ -114,6 +115,15 @@ func (c *statsClient) GetAllStocks(ctx context.Context, in *Empty, opts ...grpc.
 	return out, nil
 }
 
+func (c *statsClient) GetAllVaccineEntries(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*VaccineEntryList, error) {
+	out := new(VaccineEntryList)
+	err := c.cc.Invoke(ctx, "/covid_stats.Stats/GetAllVaccineEntries", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // StatsServer is the server API for Stats service.
 // All implementations must embed UnimplementedStatsServer
 // for forward compatibility
@@ -122,6 +132,7 @@ type StatsServer interface {
 	GetAllCovidCases(context.Context, *Empty) (*CovidCaseStatEntryList, error)
 	GetAllStocksStream(*Empty, Stats_GetAllStocksStreamServer) error
 	GetAllStocks(context.Context, *Empty) (*StockList, error)
+	GetAllVaccineEntries(context.Context, *Empty) (*VaccineEntryList, error)
 	mustEmbedUnimplementedStatsServer()
 }
 
@@ -140,6 +151,9 @@ func (UnimplementedStatsServer) GetAllStocksStream(*Empty, Stats_GetAllStocksStr
 }
 func (UnimplementedStatsServer) GetAllStocks(context.Context, *Empty) (*StockList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllStocks not implemented")
+}
+func (UnimplementedStatsServer) GetAllVaccineEntries(context.Context, *Empty) (*VaccineEntryList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllVaccineEntries not implemented")
 }
 func (UnimplementedStatsServer) mustEmbedUnimplementedStatsServer() {}
 
@@ -232,6 +246,24 @@ func _Stats_GetAllStocks_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Stats_GetAllVaccineEntries_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StatsServer).GetAllVaccineEntries(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/covid_stats.Stats/GetAllVaccineEntries",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StatsServer).GetAllVaccineEntries(ctx, req.(*Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Stats_ServiceDesc is the grpc.ServiceDesc for Stats service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -246,6 +278,10 @@ var Stats_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAllStocks",
 			Handler:    _Stats_GetAllStocks_Handler,
+		},
+		{
+			MethodName: "GetAllVaccineEntries",
+			Handler:    _Stats_GetAllVaccineEntries_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

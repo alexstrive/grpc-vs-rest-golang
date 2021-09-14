@@ -10,6 +10,8 @@ service Stats {
 
     rpc GetAllStocksStream (Empty) returns (stream Stock);
     rpc GetAllStocks (Empty) returns (StockList);
+
+    rpc GetAllVaccineEntries (Empty) returns (VaccineEntryList);
 }
 
 message Empty {
@@ -47,4 +49,26 @@ message Stock {
     float adjClose = 7;
     float volume = 8;
     float closeUSD = 9;
+}
+
+message VaccineEntryList {
+    repeated VaccineEntry entries = 1;
+}
+
+message VaccineEntry {
+    string country = 1;
+    string isoCode = 2;
+    string date = 3;
+    uint32 total_vaccinations = 4;
+    uint32 people_vaccinated = 5;
+    uint32 people_fully_vaccinated = 6;
+    uint32 daily_vaccinations_raw = 7;
+    uint32 daily_vaccinations = 8;
+    uint32 total_vaccinations_per_hundred = 9;
+    uint32 people_vaccinated_per_hundred = 10;
+    uint32 people_fully_vaccinated_per_hundred = 11;
+    uint32 daily_vaccinations_per_million = 12;
+    string vaccines = 13;
+    string source_name = 14;
+    string source_website = 15;
 }

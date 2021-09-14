@@ -108,7 +108,7 @@ func BenchmarkCovidCases_Grpc_345KB_gzip(b *testing.B) {
 		MakeGrpcCall(true, func(ctx context.Context, client pb.StatsClient) {
 			_, err := client.GetAllCovidCases(ctx, &pb.Empty{})
 			if err != nil {
-				log.Fatalf("Could not get stocks: %v", err)
+				log.Fatalf("Could not get covid cases: %v", err)
 			}
 		})
 	}
@@ -119,11 +119,53 @@ func BenchmarkCovidCases_Grpc_345KB(b *testing.B) {
 		MakeGrpcCall(false, func(ctx context.Context, client pb.StatsClient) {
 			_, err := client.GetAllCovidCases(ctx, &pb.Empty{})
 			if err != nil {
-				log.Fatalf("Could not get stocks: %v", err)
+				log.Fatalf("Could not get covid cases: %v", err)
 			}
 		})
 	}
 }
+
+// func BenchmarkCovidCases_Grpc_Stream_345KB_gzip(b *testing.B) {
+// 	for n := 0; n < b.N; n++ {
+// 		MakeGrpcCall(true, func(ctx context.Context, client pb.StatsClient) {
+// 			stream, err := client.GetAllCovidCasesStream(ctx, &pb.Empty{})
+// 			if err != nil {
+// 				log.Fatalf("Could not get stocks: %v", err)
+// 			}
+
+// 			for {
+// 				_, err := stream.Recv()
+// 				if err == io.EOF {
+// 					break
+// 				}
+// 				if err != nil {
+// 					log.Fatalf("%v.ListFeatures(_) = _, %v", client, err)
+// 				}
+// 			}
+// 		})
+// 	}
+// }
+
+// func BenchmarkCovidCases_Grpc_Stream_345KB(b *testing.B) {
+// 	for n := 0; n < b.N; n++ {
+// 		MakeGrpcCall(false, func(ctx context.Context, client pb.StatsClient) {
+// 			stream, err := client.GetAllCovidCasesStream(ctx, &pb.Empty{})
+// 			if err != nil {
+// 				log.Fatalf("Could not get stocks: %v", err)
+// 			}
+
+// 			for {
+// 				_, err := stream.Recv()
+// 				if err == io.EOF {
+// 					break
+// 				}
+// 				if err != nil {
+// 					log.Fatalf("%v.ListFeatures(_) = _, %v", client, err)
+// 				}
+// 			}
+// 		})
+// 	}
+// }
 
 func BenchmarkCovidCases_Rest_345KB(b *testing.B) {
 	for n := 0; n < b.N; n++ {
@@ -134,5 +176,39 @@ func BenchmarkCovidCases_Rest_345KB(b *testing.B) {
 func BenchmarkCovidCases_Rest_345KB_gzip(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		MakeRestRequest("covidCasesGzip")
+	}
+}
+
+func BenchmarkVaccineEntries_Grpc_7MB_gzip(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		MakeGrpcCall(true, func(ctx context.Context, client pb.StatsClient) {
+			_, err := client.GetAllVaccineEntries(ctx, &pb.Empty{})
+			if err != nil {
+				log.Fatalf("Could not get vaccine entries: %v", err)
+			}
+		})
+	}
+}
+
+func BenchmarkVaccineEntries_7MB_345KB(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		MakeGrpcCall(false, func(ctx context.Context, client pb.StatsClient) {
+			_, err := client.GetAllVaccineEntries(ctx, &pb.Empty{})
+			if err != nil {
+				log.Fatalf("Could not get vaccine entries: %v", err)
+			}
+		})
+	}
+}
+
+func BenchmarkVaccineEntries_Rest_7MB(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		MakeRestRequest("vaccines")
+	}
+}
+
+func BenchmarkVaccineEntries_Rest_7MB_gzip(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		MakeRestRequest("vaccinesGzip")
 	}
 }

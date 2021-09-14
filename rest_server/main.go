@@ -52,6 +52,17 @@ func main() {
 	http.Handle("/stocksGzip", EnableGZIP(stocksHandler))
 	http.Handle("/stocks", stocksHandler)
 
+	vaccineHandler := http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		data, err := json.Marshal(pb.VaccineEntries)
+		if err != nil {
+			log.Printf("Unable to marshal data: %v", err)
+		}
+		rw.Write(data)
+	})
+
+	http.Handle("/vaccinesGzip", EnableGZIP(vaccineHandler))
+	http.Handle("/vaccines", vaccineHandler)
+
 	log.Printf("All handlers have been registered")
 
 	http.ListenAndServe(":8080", nil)
