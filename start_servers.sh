@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 
 (cd grpc_server; go run main.go) &
 (cd rest_server; go run main.go) &
